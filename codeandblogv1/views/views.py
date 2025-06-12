@@ -89,3 +89,17 @@ def eliminar_bloque(request, nombre):
         messages.success(request, 'Publicación eliminada correctamente.')
         return redirect('publicaciones_admin')
     return render(request, 'admin/confirmar_eliminar.html', {'bloque': bloque})
+
+@login_required
+def crear_publicacion(request):
+    if not is_admin(request.user):
+        return redirect('home_blog')
+    if request.method == 'POST':
+        form = BloqueEditableForm(request.POST, request.FILES)
+        if form.is_valid():
+            bloque = form.save(commit=False)
+            bloque.save(user=request.user)
+            return redirect('publicaciones_admin')
+    else:
+        form = BloqueEditableForm()
+    return render(request, 'admin/crear_bloque.html', {'form': form})

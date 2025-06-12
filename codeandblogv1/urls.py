@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('panel/publicaciones/', views.publicaciones_admin, name='publicaciones_admin'),
+    path('panel/publicaciones/crear/', views.crear_publicacion, name='crear_publicacion'),
     path('', views.home_blog, name='home_blog'),
     #path('', include(router.urls)),
     #path('', views.editar_bloque, name='index'),
