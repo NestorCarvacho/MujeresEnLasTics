@@ -4,6 +4,14 @@ from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 
 # Create your models here.
+class Categoria_comentario(models.Model):
+    Id_categoria = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
 class BloqueEditable(models.Model):
     nombre = models.CharField(max_length=100, unique=True)  # ej: "bloque_inicio"
     contenido_html = models.TextField()
@@ -14,6 +22,7 @@ class BloqueEditable(models.Model):
     usuario_modificacion = models.ForeignKey(User, related_name='publicaciones_modificadas', on_delete=models.SET_NULL, null=True, blank=True)
     aparece_en_inicio = models.BooleanField(default=True)
     imagen = models.ImageField(upload_to='publicaciones/', null=True, blank=True, validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'gif', 'svg'])])
+    categoria = models.ForeignKey('Categoria_comentario', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -37,6 +46,7 @@ class Comentario(models.Model):
     texto = models.TextField()
     fecha = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name='comentarios_likeados', blank=True)
+    
 
     def total_likes(self):
         return self.likes.count()
