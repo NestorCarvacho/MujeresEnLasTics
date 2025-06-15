@@ -1,0 +1,93 @@
+/* Color palette 
+    Light Purple: #aa9ceb
+    Medium Blue Purple: #5b5db2
+    Dark Purple: #260f5d
+    Blue: #4752a1
+    Magenta: #b02da4
+*/
+
+/* General styles */
+body {
+    background-color: #f8f9fa;
+    color: #260f5d;
+}
+
+/* Sidebar styles */
+#sidebar {
+    background: linear-gradient(to bottom, #5b5db2, #260f5d) !important;
+}
+
+#sidebar .nav-link:hover {
+    background-color: #aa9ceb;
+    color: #260f5d !important;
+    transition: all 0.3s ease;
+}
+
+/* Navbar styles */
+.navbar {
+    background: linear-gradient(to right, #5b5db2, #4752a1) !important;
+}
+
+.navbar-brand {
+    color: #aa9ceb !important;
+    font-weight: bold;
+}
+
+.nav-link {
+    color: #aa9ceb !important;
+}
+
+.nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #5b5db2 !important;
+    border-color: #4752a1 !important;
+}
+
+.btn-primary:hover {
+    background-color: #4752a1 !important;
+    border-color: #260f5d !important;
+}
+
+/* Links */
+a {
+    color: #5b5db2;
+}
+
+a:hover {
+    color: #b02da4;
+    text-decoration: none;
+}
+
+/* Custom accent elements */
+.accent-text {
+    color: #b02da4;
+}
+
+.accent-bg {
+    background-color: #aa9ceb;
+}
+
+/* Cards and content blocks */
+.card {
+    border-color: #5b5db2;
+}
+
+.card-header {
+    background-color: #aa9ceb;
+    color: #260f5d;
+}
+
+/* Form elements */
+.form-control:focus {
+    border-color: #5b5db2;
+    box-shadow: 0 0 0 0.2rem rgba(91, 93, 178, 0.25);
+}
+
+/* Custom separator */
+hr {
+    border-color: #aa9ceb;
+}

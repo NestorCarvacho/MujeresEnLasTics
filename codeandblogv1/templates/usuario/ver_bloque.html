@@ -1,5 +1,7 @@
-<!DOCTYPE html>
-<html>
+{% extends 'usuario/home_blog.html' %}
+{% load static %}
+
+{% block contenido %}
 <head>
   <title>Contenido</title>
   <style>
@@ -15,14 +17,38 @@
   </div>
   <hr>
   <h4>Comentarios</h4>
-  <div id="comentarios">
-    {% for comentario in comentarios %}
-      <div class="mb-2 border rounded p-2">
-        <strong>{{ comentario.usuario.username }}</strong> <span class="text-muted">{{ comentario.fecha|date:'d/m/Y H:i' }}</span><br>
-        {{ comentario.texto|linebreaksbr }}<br>
-        <button class="btn btn-link btn-sm like-btn" data-id="{{ comentario.id }}">
-          👍 <span class="like-count">{{ comentario.total_likes }}</span>
-        </button>
+  <div id="comentarios">    {% for comentario in comentarios %}
+      <div id="comment-{{ comentario.id }}" class="mb-2 border rounded p-2">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <strong>{{ comentario.usuario.username }}</strong> 
+            <span class="text-muted">{{ comentario.fecha|date:'d/m/Y H:i' }}</span>
+          </div>
+          {% if user.is_authenticated and user.is_superuser or user == comentario.usuario %}
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary edit-comment" data-id="{{ comentario.id }}">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn btn-sm btn-outline-danger delete-comment" data-id="{{ comentario.id }}">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+          {% endif %}
+        </div>
+        <div class="comment-content" id="comment-content-{{ comentario.id }}">
+          {{ comentario.texto|linebreaksbr }}
+        </div>
+        <div class="comment-edit-form mt-2 d-none" id="comment-edit-{{ comentario.id }}">
+          <textarea class="form-control mb-2">{{ comentario.texto }}</textarea>
+          <button class="btn btn-sm btn-primary save-edit" data-id="{{ comentario.id }}">Guardar</button>
+          <button class="btn btn-sm btn-secondary cancel-edit" data-id="{{ comentario.id }}">Cancelar</button>
+        </div>
+        <div class="mt-2">
+          <button class="like-btn" data-id="{{ comentario.id }}" data-liked="{% if user in comentario.likes.all %}true{% else %}false{% endif %}">
+            <span class="like-icon">{% if user in comentario.likes.all %}💜{% else %}🖤{% endif %}</span>
+            <span class="like-count">{{ comentario.total_likes }}</span>
+          </button>
+        </div>
       </div>
     {% empty %}
       <p>No hay comentarios aún.</p>
@@ -37,20 +63,112 @@
     <button type="submit" class="btn btn-primary">Comentar</button>
   </form>
   {% else %}
-    <div class="alert alert-info mt-3">Inicia sesión para comentar y dar like.</div>
-  {% endif %}
+    <div class="alert alert-info mt-3">Inicia sesión para comentar y dar like.</div>  {% endif %}  
+  {% csrf_token %}
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <script>
-    $(function(){
+    $(function(){      // Setup CSRF token for all AJAX requests
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      const csrftoken = getCookie('csrftoken');
+      
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+          }
+        }
+      });
+
+      // Like functionality
       $('.like-btn').click(function(e){
         e.preventDefault();
         var btn = $(this);
         var id = btn.data('id');
         $.get('/comentario/like/' + id + '/', function(data){
           btn.find('.like-count').text(data.total_likes);
+          btn.attr('data-liked', data.liked);
+          btn.find('.like-icon').text(data.liked ? '💜' : '🖤');
         });
+      });      // Edit comment
+      $(document).on('click', '.edit-comment', function(){
+        var id = $(this).data('id');
+        $('#comment-content-' + id).hide();
+        $('#comment-edit-' + id).removeClass('d-none');
+      });
+
+      // Cancel edit
+      $(document).on('click', '.cancel-edit', function(){
+        var id = $(this).data('id');
+        $('#comment-content-' + id).show();
+        $('#comment-edit-' + id).addClass('d-none');
+      });
+
+      // Save edit
+      $(document).on('click', '.save-edit', function(){
+        var id = $(this).data('id');
+        var $button = $(this);
+        var $comment = $('#comment-' + id);
+        var newText = $button.closest('.comment-edit-form').find('textarea').val();
+        
+        $.ajax({
+          url: '/comentario/editar/' + id + '/',
+          type: 'POST',
+          data: {
+            'texto': newText
+          },
+          success: function(response){
+            if(response.success){
+              $('#comment-content-' + id).html(newText).show();
+              $('#comment-edit-' + id).addClass('d-none');
+            } else {
+              alert('Error al editar el comentario');
+            }
+          },
+          error: function(){
+            alert('Error al editar el comentario');
+          }
+        });
+      });
+
+      // Delete comment
+      $(document).on('click', '.delete-comment', function(){
+        var id = $(this).data('id');
+        var $comment = $('#comment-' + id);
+        
+        if(confirm('¿Estás seguro de que quieres eliminar este comentario?')){
+          $.ajax({
+            url: '/comentario/eliminar/' + id + '/',
+            type: 'POST',
+            success: function(response){
+              if(response.success){
+                $comment.fadeOut(function(){
+                  $(this).remove();
+                });
+              } else {
+                alert('Error al eliminar el comentario');
+              }
+            },
+            error: function(){
+              alert('Error al eliminar el comentario');
+            }
+          });
+        }
       });
     });
   </script>
 </body>
-</html>
+{% endblock contenido %}

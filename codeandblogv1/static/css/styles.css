@@ -1,0 +1,187 @@
+/* Color palette 
+    Light Lavender: #e7daf6
+    Soft Pink: #e5affa
+    Royal Purple: #7044bf
+    Light Blue: #92dcf9
+    Medium Blue: #62b2d7
+*/
+
+/* General styles */
+body {
+    background-color: #fff;
+    color: #7044bf;
+}
+
+/* Sidebar styles */
+#sidebar {
+    background: linear-gradient(to bottom, #7044bf, #62b2d7) !important;
+}
+
+#sidebar .nav-link:hover {
+    background-color: #e7daf6;
+    color: #7044bf !important;
+    transition: all 0.3s ease;
+}
+
+/* Navbar styles */
+.navbar {
+    background: linear-gradient(to right, #7044bf, #62b2d7) !important;
+}
+
+.navbar-brand {
+    color: #e7daf6 !important;
+    font-weight: bold;
+}
+
+.nav-link {
+    color: #e7daf6 !important;
+}
+
+.nav-link:hover {
+    color: #92dcf9 !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #7044bf !important;
+    border-color: #62b2d7 !important;
+}
+
+.btn-primary:hover {
+    background-color: #62b2d7 !important;
+    border-color: #92dcf9 !important;
+}
+
+/* Links */
+a {
+    color: #7044bf;
+}
+
+a:hover {
+    color: #e5affa;
+    text-decoration: none;
+}
+
+/* Custom accent elements */
+.accent-text {
+    color: #e5affa;
+}
+
+.accent-bg {
+    background-color: #e7daf6;
+}
+
+/* Cards and content blocks */
+.card {
+    border-color: #62b2d7;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: #e7daf6;
+    color: #7044bf;
+}
+
+/* Form elements */
+.form-control:focus {
+    border-color: #92dcf9;
+    box-shadow: 0 0 0 0.2rem rgba(98, 178, 215, 0.25);
+}
+
+/* Custom separator */
+hr {
+    border-color: #e5affa;
+}
+
+/* Estilos para botones de like */
+.like-btn {
+    border: none;
+    background: none;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    font-size: 1.2rem;
+    color: #b02da4;
+}
+
+.like-btn:hover {
+    transform: scale(1.2);
+}
+
+.like-btn[data-liked="true"] {
+    color: #ff4081;
+    animation: like-animation 0.3s ease;
+}
+
+@keyframes like-animation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.like-count {
+    font-size: 0.9rem;
+    color: #666;
+    margin-left: 0.25rem;
+}
+
+/* Sobre Nosotras styles */
+.about-section {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    padding: 2rem;
+}
+
+.about-section h1 {
+    color: var(--admin-primary);
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.about-section .lead {
+    color: #62b2d7;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.feature-list h3 {
+    color: var(--admin-primary);
+}
+
+.feature-list ul li {
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature-icon {
+    font-size: 1.5rem;
+    color: #62b2d7;
+}
+
+.cta-section {
+    background: linear-gradient(to right, var(--admin-primary), #62b2d7);
+    color: white;
+    border-radius: 10px;
+    padding: 3rem !important;
+    margin-top: 2rem;
+}
+
+.cta-section .btn-primary {
+    background-color: white;
+    color: var(--admin-primary);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.cta-section .btn-primary:hover {
+    background-color: var(--admin-light);
+    transform: scale(1.05);
+}

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from ..models import BloqueEditable, Comentario
+from ..models import BloqueEditable, Comentario, Categoria_comentario
 from ..forms import BloqueEditableForm
 from django.http import JsonResponse
 
@@ -33,12 +33,13 @@ def editar_bloque(request, nombre):
 def vista_usuario(request, nombre):
     bloque = get_object_or_404(BloqueEditable, nombre=nombre)
     comentarios = bloque.comentarios.select_related('usuario').all().order_by('-fecha')
+    categorias = Categoria_comentario.objects.all()
     if request.method == 'POST' and request.user.is_authenticated:
         texto = request.POST.get('comentario')
         if texto:
             Comentario.objects.create(bloque=bloque, usuario=request.user, texto=texto)
             return redirect('vista_usuario', nombre=nombre)
-    return render(request, 'usuario/ver_bloque.html', {'bloque': bloque, 'comentarios': comentarios})
+    return render(request, 'usuario/ver_bloque.html', {'bloque': bloque, 'comentarios': comentarios, 'categorias': categorias})
 
 @login_required
 def like_comentario(request, comentario_id):
@@ -53,7 +54,11 @@ def like_comentario(request, comentario_id):
 
 def home_blog(request):
     publicaciones = BloqueEditable.objects.filter(aparece_en_inicio=True).order_by('-fecha_registro')
-    return render(request, 'usuario/home_blog.html', {'publicaciones': publicaciones})
+    categorias = Categoria_comentario.objects.all()
+    return render(request, 'usuario/publicaciones_recientes.html', {
+        'publicaciones': publicaciones,
+        'categorias': categorias
+    })
 
 @login_required
 def publicaciones_admin(request):
@@ -103,3 +108,51 @@ def crear_publicacion(request):
     else:
         form = BloqueEditableForm()
     return render(request, 'admin/crear_bloque.html', {'form': form})
+
+def publicaciones_por_categoria(request, categoria_id):
+    categoria = get_object_or_404(Categoria_comentario, Id_categoria=categoria_id)
+    publicaciones = BloqueEditable.objects.filter(categoria=categoria).order_by('-fecha_registro')
+    categorias = Categoria_comentario.objects.all()
+    return render(request, 'usuario/publicaciones_recientes.html', {
+        'publicaciones': publicaciones,
+        'categorias': categorias,
+        'categoria_actual': categoria
+    })
+
+@login_required
+def editar_comentario(request, comentario_id):
+    comentario = get_object_or_404(Comentario, id=comentario_id)
+    
+    # Verificar permisos
+    if not request.user.is_superuser and request.user != comentario.usuario:
+        return JsonResponse({'success': False, 'error': 'No tienes permiso para editar este comentario'})
+    
+    if request.method == 'POST':
+        nuevo_texto = request.POST.get('texto')
+        if nuevo_texto:
+            comentario.texto = nuevo_texto
+            comentario.save()
+            return JsonResponse({
+                'success': True,
+                'texto': nuevo_texto
+            })
+    return JsonResponse({'success': False})
+
+@login_required
+def eliminar_comentario(request, comentario_id):
+    comentario = get_object_or_404(Comentario, id=comentario_id)
+    
+    # Verificar permisos
+    if not request.user.is_superuser and request.user != comentario.usuario:
+        return JsonResponse({'success': False, 'error': 'No tienes permiso para eliminar este comentario'})
+    
+    if request.method == 'POST':
+        comentario.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+def sobre_nosotras(request):
+    categorias = Categoria_comentario.objects.all()
+    return render(request, 'usuario/sobre_nosotras.html', {
+        'categorias': categorias
+    })
