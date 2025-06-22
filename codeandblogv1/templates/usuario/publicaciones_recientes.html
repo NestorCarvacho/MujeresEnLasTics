@@ -12,7 +12,7 @@
                     {{ publicacion.estilos_css|safe }}
                 </style>
                 {% if publicacion.imagen %}
-                    <img src="{{ publicacion.imagen.url }}" class="card-img-top" alt="Imagen publicación" style="max-height:200px;object-fit:cover;">
+                    <img src="{{ publicacion.imagen.url }}" class="card-img-top" alt="Imagen publicación" style="height:100px;object-fit:cover;">
                 {% else %}
                     <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Logo_DuocUC.svg" class="card-img-top" alt="Imagen por defecto" style="max-height:200px;object-fit:contain;background:#fff;">
                 {% endif %}
@@ -21,7 +21,7 @@
                     <p class="card-text"><small class="text-muted">Publicado por {{ publicacion.usuario_creador }} el {{ publicacion.fecha_registro|date:"d/m/Y" }}</small></p>
                     <p class="card-text"><small class="text-muted">{{ publicacion.categoria.nombre }}</small></p>
 
-                    <div class="card-text">{{ publicacion.contenido_html|safe|truncatechars:120 }}</div>
+                    <div class="card-text">{{ publicacion.contenido_html|striptags|truncatechars:120 }}</div>
                     <a href="{% url 'vista_usuario' publicacion.nombre %}" class="btn btn-outline-primary mt-2">Ver noticia completa</a>
                 </div>
             </div>
